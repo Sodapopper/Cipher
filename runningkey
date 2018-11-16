@@ -1,0 +1,168 @@
+import java.util.Scanner;
+public class Main{
+    public static void main (String [] args){
+        Scanner console = new Scanner(System.in);
+        System.out.println("Encrypt or Decrypt?");
+        String answer = console.nextLine(); //chooses path between decrypt or encrypt
+        if(answer.toLowerCase().equals("encrypt")){
+            System.out.println("Enter a key");
+            String key = console.nextLine(); //makes key
+            System.out.println("Enter the plain text");
+            String input = console.nextLine(); //makes input (the plain text)
+            Cipher encrypt = new Cipher(key,input); // constructor
+            encrypt.key(); //methods to encrypt
+            encrypt.input();
+            encrypt.encrypt();
+        }
+        if(answer.toLowerCase().equals("decrypt")){
+            System.out.println("Enter a key");
+            String key = console.nextLine(); //makes key
+            System.out.println("Enter the encrypted text");
+            String enc = console.nextLine(); //makes input (plain text)
+            Decrypt decrypt = new Decrypt(enc,key); //constructor
+            decrypt.key(); //methods to decrypt
+            decrypt.enclet();
+            decrypt.enc();
+            decrypt.text();
+        }
+    }
+}
+public class Alpha{
+   char grid[][] = chart(); //makes it useable for other classes
+   public static char[][] chart(){
+        char[][] chart = new char[26][26]; //26x26 array
+        for(int i=0; i<26; i++){ //26 letters in alphabet
+            for (int j=0; j<26; j++){ //26 letters in alphabet
+               int let = i + j; //casted to char later
+               if(let >= 26){ //keeps int smaller or equal to 26 (26 letters in alphabet)
+                  let = let - 26; 
+               } 
+               let = let + 65; //prevents it from returning ASCII 
+               char letter = (char)let; //changes int ---> char
+               chart[i][j] = letter; //put each letter in specific slot
+            }
+        }
+        return chart;
+   }
+}
+
+import java.util.Arrays;
+import java.util.Scanner;
+import java.util.ArrayList;
+public class Cipher{
+    private String input;
+    private String key;
+    ArrayList<Integer> list = new ArrayList<Integer>(); //list for positions of key
+    ArrayList<Integer> list2 = new ArrayList<Integer>(); //list for positions of input
+    Alpha alpha = new Alpha(); //calls class that has the chart
+    char[][] chart = alpha.grid; //alphabet chart
+    
+    public Cipher(String theinput,String thekey){ //constructor
+        input = theinput.replaceAll(" ","").toUpperCase();
+        key = thekey.replaceAll(" ","").toUpperCase();
+    }
+    public String getCipher(String theinput){ //getter
+        return input;
+    }
+    public String getKeyCipher(String thekey){
+        return key;
+    }
+    public void key(){ //finds position of each chracter in the sentence of the key
+        for (int i=0; i<key.length(); i++){ //goes through every char in key
+             char keyletter = key.charAt(i); 
+             for(int g=0; g<chart.length; g++){ //goes through every single alphabet
+                 if (chart[0][g] == keyletter){
+                     list.add(g); //adds each position (number) to a list
+                 } 
+             }
+        } 
+    }
+    public ArrayList getlist(){ //returns list
+        return list;
+    }
+    public void input(){ //finds position of each character in the sentence of the plain text
+        for (int a=0; a<input.length(); a++){ //goes through every char in plain text
+             char inputletter = input.charAt(a); 
+             for(int b=0; b<chart.length; b++){ //goes through every singl alphabet 
+                 if (chart[b][0] == inputletter){
+                     list2.add(b); //records position to list2
+                 } 
+             }
+        } 
+    }
+    public ArrayList getlist2(){ 
+        return list2;
+    }
+    public void encrypt(){ //uses the value in lists to find encrypted text
+        if (list.size()>list2.size()){ //checks if key is longer than plain text
+            System.out.println("KeyStream should be as long as the plain text.");
+        } else {
+        for (int k=0; k< list2.size(); k++){ //prints encrypted by using 2d array of chart and uses indexes from the lists.
+            System.out.print(chart[list.get(k)][list2.get(k)]);
+        }
+        }
+    } 
+}
+import java.util.ArrayList;
+public class Decrypt{
+    private String enc;
+    private String key;
+    ArrayList<Character> encletterlist = new ArrayList<Character>(); //list of chracters in  encrypted
+    ArrayList<Integer> list = new ArrayList<Integer>(); //list of integers of positions in the key sentence
+    ArrayList<Integer> enclist = new ArrayList<Integer>(); //list of integers of positions in encrypted line.
+    Alpha alpha = new Alpha(); //new alphabet grid
+    char[][] chart = alpha.grid;
+    public Decrypt(String theenc,String thekey){ //constructor
+        enc = theenc.replaceAll(" ","").toUpperCase();
+        key = thekey.replaceAll(" ","").toUpperCase();
+    }
+    public String getCipher(String theenc){
+        return enc;
+    }
+    public String getKeyCipher(String thekey){
+        return key;
+    }
+    public void key(){ 
+        for (int i=0; i< key.length(); i++){ //finds all chars in key
+             char keyletter = key.charAt(i); 
+             for(int g=0; g < chart.length; g++){ //finds all positions as numbers of that char
+                 if (chart[g][0] == keyletter){
+                     list.add(g); //adds to lsit
+                 } 
+             }
+        } 
+    }
+    public ArrayList getlist(){
+        return list;
+    }
+    public void enclet(){ //makes a list of all the chars in enclet
+        for (int a=0; a<enc.length(); a++){
+            encletterlist.add(enc.charAt(a));
+        } 
+    }
+    public ArrayList getencletterlist(){
+        return encletterlist;
+    }
+    public void enc(){ 
+        for (int a=0; a < encletterlist.size() ; a++){ 
+             for(int b=0; b<chart.length; b++){
+                 if (chart[list.get(a)/*list of key is fixed so the columb will be able to choose the char in the row*/][b] == encletterlist.get(a)){ //
+                     enclist.add(b); //adds the row number to the list
+                 } 
+             }
+        } 
+    }
+    public ArrayList getlist2(){
+        return enclist;
+    }
+    
+    public void text(){
+        if (list.size() < enclist.size()){ //checks if the encrypted list is longer than the key list
+            System.out.println("KeyStream should be as long as the ciphered text");
+        } else {
+            for (int k=0; k<enclist.size(); k++){
+                System.out.print(chart[0]/*should be 0 because only the top row is */[enclist.get(k)]);
+            }
+        }
+    }
+}
